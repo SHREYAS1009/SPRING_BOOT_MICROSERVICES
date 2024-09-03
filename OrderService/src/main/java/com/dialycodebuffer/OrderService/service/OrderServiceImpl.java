@@ -1,10 +1,13 @@
 package com.dialycodebuffer.OrderService.service;
 
+import com.dailycodebuffer.ProductService.model.ProductResponse;
 import com.dialycodebuffer.OrderService.entity.Order;
 import com.dialycodebuffer.OrderService.exception.CustomException;
 import com.dialycodebuffer.OrderService.external.client.PaymentService;
 import com.dialycodebuffer.OrderService.external.client.ProductService;
 import com.dialycodebuffer.OrderService.external.request.PaymentRequest;
+import com.dailycodebuffer.OrderService.external.response.PaymentResponse;
+import com.dialycodebuffer.OrderService.external.response.PaymentResponse;
 import com.dialycodebuffer.OrderService.model.OrderRequest;
 import com.dialycodebuffer.OrderService.model.OrderResponse;
 import com.dialycodebuffer.OrderService.model.PaymentMode;
@@ -16,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 
@@ -27,9 +31,15 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
 
     @Autowired
+    private RestTemplate restTemplate;
+
+
+    @Autowired
     private ProductService productService;
     @Autowired
     private PaymentService paymentService;
+
+
     @Override
     public long placeOrder(@RequestBody  OrderRequest orderRequest)
     {
@@ -90,11 +100,43 @@ public class OrderServiceImpl implements OrderService {
 
         Order order=orderRepository.findById(orderId)
                 .orElseThrow(()->new CustomException("Order not found","NOT_FOUND",404));
-        
+
+
+        log.info("Invoking product service to fetch the id:{}",order.getProductId());
+        ProductResponse productResponse= restTemplate.getForObject("http://PRODUCT-SERVICE/product/" +order.getProductId(),ProductResponse.class);
+
+
+        log.info("Getting payment information from the order details");
+        log.info("Getting payment information form the payment Service");
+        PaymentResponse paymentResponse
+                = restTemplate.getForObject(
+                "http://PAYMENT-SERVICE/payment/order/" + order.getId(),
+                PaymentResponse.class
+        );
+
+        OrderResponse.ProductDetails productDetails
+                = OrderResponse.ProductDetails
+                .builder()
+                .productName(productResponse.getProductName())
+                .productId(productResponse.getProductId())
+                .build();
+
+
+        OrderResponse.PaymentDetails paymentDetails
+                = OrderResponse.PaymentDetails
+                .builder()
+                .paymentId(paymentResponse.getPaymentId())
+                .paymentStatus(paymentResponse.getStatus())
+                .paymentDate(paymentResponse.getPaymentDate())
+                .paymentMode(paymentResponse.getPaymentMode())
+                .build();
+
         OrderResponse orderResponse=OrderResponse.builder()
         .orderId(order.getId()).orderStatus(order.getOrderStatus())
                         .amount(order.getAmount())
                                 .orderDate(order.getOrderDate())
+                .productDetails(productDetails)
+                .paymentDetails(paymentDetails)
                 .build();
 
         return orderResponse;
