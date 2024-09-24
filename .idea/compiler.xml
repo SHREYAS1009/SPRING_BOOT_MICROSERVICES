@@ -9,19 +9,21 @@
         <outputRelativeToContentRoot value="true" />
         <module name="ConfigServer" />
         <module name="OrderService" />
-        <module name="ProductService" />
         <module name="service-registry" />
+        <module name="ProductService" />
         <module name="PaymentService" />
-        <module name="demo-spring-boot" />
+        <module name="CloudGateway" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="demo-spring-boot" target="17" />
       <module name="service-registry (1)" target="17" />
       <module name="service-registry (2)" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="CloudGateway" options="-parameters" />
       <module name="ConfigServer" options="-parameters" />
       <module name="OrderService" options="-parameters" />
       <module name="PaymentService" options="-parameters" />

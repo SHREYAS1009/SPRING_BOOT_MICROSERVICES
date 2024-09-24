@@ -1,22 +1,21 @@
 package com.dialycodebuffer.OrderService.service;
 
-import com.dailycodebuffer.ProductService.model.ProductResponse;
+
 import com.dialycodebuffer.OrderService.entity.Order;
 import com.dialycodebuffer.OrderService.exception.CustomException;
 import com.dialycodebuffer.OrderService.external.client.PaymentService;
 import com.dialycodebuffer.OrderService.external.client.ProductService;
 import com.dialycodebuffer.OrderService.external.request.PaymentRequest;
-import com.dailycodebuffer.OrderService.external.response.PaymentResponse;
-import com.dialycodebuffer.OrderService.external.response.PaymentResponse;
+
+import com.dialycodebuffer.OrderService.external.response.ProductResponse;
 import com.dialycodebuffer.OrderService.model.OrderRequest;
 import com.dialycodebuffer.OrderService.model.OrderResponse;
 import com.dialycodebuffer.OrderService.model.PaymentMode;
+import com.dialycodebuffer.OrderService.model.PaymentMode;
 import com.dialycodebuffer.OrderService.repository.OrderRepository;
+import com.example.PaymentService.model.PaymentResponse;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
@@ -32,7 +31,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private RestTemplate restTemplate;
-
+    private ProductResponse productResponse;
 
     @Autowired
     private ProductService productService;
@@ -101,8 +100,7 @@ public class OrderServiceImpl implements OrderService {
         Order order=orderRepository.findById(orderId)
                 .orElseThrow(()->new CustomException("Order not found","NOT_FOUND",404));
 
-
-        log.info("Invoking product service to fetch the id:{}",order.getProductId());
+        /*log.info("Invoking product service to fetch the id:{}",order.getProductId());
         ProductResponse productResponse= restTemplate.getForObject("http://PRODUCT-SERVICE/product/" +order.getProductId(),ProductResponse.class);
 
 
@@ -121,22 +119,22 @@ public class OrderServiceImpl implements OrderService {
                 .productId(productResponse.getProductId())
                 .build();
 
-
+         /*
         OrderResponse.PaymentDetails paymentDetails
                 = OrderResponse.PaymentDetails
                 .builder()
                 .paymentId(paymentResponse.getPaymentId())
                 .paymentStatus(paymentResponse.getStatus())
                 .paymentDate(paymentResponse.getPaymentDate())
-                .paymentMode(paymentResponse.getPaymentMode())
-                .build();
 
+                .build();
+        */
         OrderResponse orderResponse=OrderResponse.builder()
         .orderId(order.getId()).orderStatus(order.getOrderStatus())
                         .amount(order.getAmount())
                                 .orderDate(order.getOrderDate())
-                .productDetails(productDetails)
-                .paymentDetails(paymentDetails)
+                 //  .productDetails(productDetails)
+                //.paymentDetails(paymentDetails)
                 .build();
 
         return orderResponse;

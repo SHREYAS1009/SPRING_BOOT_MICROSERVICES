@@ -35,7 +35,7 @@ public class OrderController
     public ResponseEntity<OrderResponse> getOrderDetails(@PathVariable long orderId)
     {
         OrderResponse orderResponse=orderService.getOrderDetails(orderId);
-        OrderRepository orderRepository;
+
 
         return new ResponseEntity<>(orderResponse,HttpStatus.OK);
 
