@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient("PRODUCT-SERVICE/product")
 public interface ProductService
 {
-
     @PutMapping("/reduceQuantity/{id}")
     ResponseEntity<Void> reduceQuantity(@PathVariable("id") long ProductId, @RequestParam long quantity);
     default void fallback(Exception e)
